@@ -1,102 +1,154 @@
 <template>
-  <div class="festivals-page">
-    <h1 class="uk-heading-primary">Festivals Français</h1>
-    <p>Découvrez les festivals culturels en France grâce aux données du Ministère de la Culture.</p>
-    
-    <div class="uk-margin">
-      <div class="uk-grid-small uk-flex-middle" uk-grid>
-        <div class="uk-width-auto">
-          <button 
-            @click="() => fetchFestivals(1)" 
-            class="uk-button uk-button-primary"
-            :disabled="loading"
-          >
-            <span v-if="loading" uk-spinner="ratio: 0.5" class="uk-margin-small-right"></span>
-            {{ loading ? 'Chargement...' : 'Charger les Festivals' }}
-          </button>
-          
-          <button 
-            @click="() => testApiConnection()" 
-            class="uk-button uk-button-secondary uk-margin-small-left"
-            :disabled="loading"
-          >
-            🔍 Test API
-          </button>
-          
-          <button 
-            @click="showLogs = !showLogs" 
-            class="uk-button uk-button-default uk-margin-small-left"
-          >
-            📋 {{ showLogs ? 'Masquer' : 'Voir' }} Logs
-          </button>
-        </div>
-        
-        <div class="uk-width-auto" v-if="totalCount > 0">
-          <span class="uk-text-meta">
-            Page {{ currentPage }} - {{ startIndex }} à {{ endIndex }} sur {{ totalCount }} festivals
-            <span v-if="searchTerm" class="uk-label uk-label-warning uk-margin-small-left">
-              🔍 Recherche: "{{ searchTerm }}"
-            </span>
-          </span>
-        </div>
-        
-        <div class="uk-width-auto" v-if="totalCount > 0">
-          <select v-model="itemsPerPage" @change="changeItemsPerPage" class="uk-select uk-form-small uk-form-width-small">
-            <option value="10">10 par page</option>
-            <option value="20">20 par page</option>
-            <option value="50">50 par page</option>
-          </select>
-        </div>
+  <div class="uk-section uk-section-default">
+    <div class="uk-container">
+      <!-- Header -->
+      <div class="uk-text-center uk-margin-large-bottom">
+        <h1 class="uk-heading-primary">
+          🎭 Festivals Français
+        </h1>
+        <p class="uk-text-large uk-text-muted">
+          Découvrez les festivals culturels en France
+        </p>
       </div>
-    </div>
 
-    <!-- Filtres -->
-    <div v-if="festivals.length > 0" class="uk-margin">
-      <div class="uk-grid-small" uk-grid>
-        <div class="uk-width-1-3@s">
-          <select v-model="filterRegion" @change="filterFestivals" class="uk-select">
-            <option value="">Toutes les régions</option>
-            <option v-for="region in uniqueRegions" :key="region" :value="region">
-              {{ region }}
-            </option>
-          </select>
-        </div>
-        <div class="uk-width-1-3@s">
-          <select v-model="filterDiscipline" @change="filterFestivals" class="uk-select">
-            <option value="">Toutes les disciplines</option>
-            <option v-for="discipline in uniqueDisciplines" :key="discipline" :value="discipline">
-              {{ discipline }}
-            </option>
-          </select>
-        </div>
-        <div class="uk-width-1-3@s">
-          <div class="uk-inline uk-width-1-1">
-            <input 
-              v-model="searchTerm" 
-              @keyup.enter="searchFestivals"
-              @input="onSearchInput"
-              type="text" 
-              placeholder="Rechercher un festival..."
-              class="uk-input"
-            >
-            <button 
-              v-if="searchTerm" 
-              @click="clearSearch"
-              class="uk-form-icon uk-form-icon-flip"
-              type="button"
-            >
-              <span uk-icon="close"></span>
-            </button>
-            <button 
-              @click="searchFestivals"
-              class="uk-button uk-button-primary uk-button-small uk-margin-small-left"
-            >
-              🔍
-            </button>
+      <!-- Barre d'actions -->
+      <div class="uk-margin-medium-bottom">
+        <div class="uk-card uk-card-default uk-card-body">
+          <div class="uk-grid-small uk-flex-middle uk-flex-between" uk-grid>
+            <div class="uk-width-auto">
+              <div class="uk-button-group">
+                <button 
+                  @click="() => fetchFestivals(1)" 
+                  class="uk-button uk-button-primary"
+                  :disabled="loading"
+                >
+                  <span v-if="loading" uk-spinner="ratio: 0.5" class="uk-margin-small-right"></span>
+                  <span uk-icon="refresh" class="uk-margin-small-right" v-if="!loading"></span>
+                  {{ loading ? 'Chargement...' : 'Actualiser' }}
+                </button>
+                
+                <button 
+                  @click="() => testApiConnection()" 
+                  class="uk-button uk-button-secondary"
+                  :disabled="loading"
+                >
+                  <span uk-icon="search" class="uk-margin-small-right"></span>
+                  Test API
+                </button>
+                
+                <button 
+                  @click="showLogs = !showLogs" 
+                  class="uk-button uk-button-default"
+                >
+                  <span uk-icon="list" class="uk-margin-small-right"></span>
+                  {{ showLogs ? 'Masquer' : 'Voir' }} Logs
+                </button>
+              </div>
+            </div>
+            
+            <div class="uk-width-auto" v-if="totalCount > 0">
+              <span class="uk-badge uk-background-primary">{{ totalCount }}</span>
+              <span class="uk-text-meta uk-margin-small-left">festivals disponibles</span>
+              <span v-if="searchTerm" class="uk-label uk-label-warning uk-margin-small-left">
+                <span uk-icon="search" class="uk-margin-small-right"></span>
+                "{{ searchTerm }}"
+              </span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- Filtres -->
+      <div v-if="festivals.length > 0" class="uk-margin-medium-bottom">
+        <div class="uk-card uk-card-default uk-card-body">
+          <h3 class="uk-card-title">
+            <span uk-icon="settings" class="uk-margin-small-right"></span>
+            Filtres et recherche
+          </h3>
+          
+          <div class="uk-grid-small uk-grid-match" uk-grid>
+            <!-- Recherche -->
+            <div class="uk-width-1-2@s uk-width-1-3@m">
+              <label class="uk-form-label">
+                <span uk-icon="search" class="uk-margin-small-right"></span>
+                Recherche
+              </label>
+              <div class="uk-inline uk-width-1-1">
+                <input 
+                  v-model="searchTerm" 
+                  @keyup.enter="searchFestivals"
+                  @input="onSearchInput"
+                  type="text" 
+                  placeholder="Nom du festival..."
+                  class="uk-input"
+                >
+                <button 
+                  v-if="searchTerm" 
+                  @click="clearSearch"
+                  class="uk-form-icon uk-form-icon-flip"
+                  type="button"
+                >
+                  <span uk-icon="close"></span>
+                </button>
+              </div>
+              <button 
+                @click="searchFestivals"
+                class="uk-button uk-button-primary uk-button-small uk-width-1-1 uk-margin-small-top"
+                :disabled="!searchTerm.trim()"
+              >
+                <span uk-icon="search" class="uk-margin-small-right"></span>
+                Rechercher
+              </button>
+            </div>
+
+            <!-- Région -->
+            <div class="uk-width-1-2@s uk-width-1-3@m">
+              <label class="uk-form-label">
+                <span uk-icon="location" class="uk-margin-small-right"></span>
+                Région
+              </label>
+              <select v-model="filterRegion" @change="filterFestivals" class="uk-select">
+                <option value="">Toutes les régions</option>
+                <option v-for="region in uniqueRegions" :key="region" :value="region">
+                  {{ region }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Discipline -->
+            <div class="uk-width-1-1@s uk-width-1-3@m">
+              <label class="uk-form-label">
+                <span uk-icon="tag" class="uk-margin-small-right"></span>
+                Discipline
+              </label>
+              <select v-model="filterDiscipline" @change="filterFestivals" class="uk-select">
+                <option value="">Toutes les disciplines</option>
+                <option v-for="discipline in uniqueDisciplines" :key="discipline" :value="discipline">
+                  {{ discipline }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Info pagination -->
+          <div class="uk-margin-small-top uk-text-center" v-if="totalCount > 0">
+            <div class="uk-grid-small uk-flex-middle uk-flex-center" uk-grid>
+              <div>
+                <span class="uk-text-meta">
+                  Page {{ currentPage }} - {{ startIndex }} à {{ endIndex }} sur {{ totalCount }} résultats
+                </span>
+              </div>
+              <div>
+                <select v-model="itemsPerPage" @change="changeItemsPerPage" class="uk-select uk-form-small uk-form-width-small">
+                  <option value="10">10 par page</option>
+                  <option value="20">20 par page</option>
+                  <option value="50">50 par page</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
     <!-- Affichage des logs -->
     <div v-if="showLogs" class="uk-margin">
@@ -104,17 +156,21 @@
         <div class="uk-card-header">
           <div class="uk-grid-small uk-flex-middle" uk-grid>
             <div class="uk-width-expand">
-              <h3 class="uk-card-title uk-margin-remove-bottom">📋 Logs de débogage</h3>
+              <h3 class="uk-card-title uk-margin-remove-bottom">
+                <span uk-icon="list" class="uk-margin-small-right"></span>
+                Logs de débogage
+              </h3>
             </div>
             <div class="uk-width-auto">
               <button @click="clearLogs" class="uk-button uk-button-danger uk-button-small">
-                🗑️ Vider
+                <span uk-icon="trash" class="uk-margin-small-right"></span>
+                Vider
               </button>
             </div>
           </div>
         </div>
-        <div class="uk-card-body">
-          <div class="logs-container" v-if="logs.length > 0">
+        <div class="uk-card-body uk-background-muted">
+          <div class="logs-container uk-background-secondary uk-light uk-padding-small" v-if="logs.length > 0">
             <div 
               v-for="(log, index) in logs.slice(-10)" 
               :key="index"
@@ -139,75 +195,105 @@
     </div>
 
     <!-- Affichage des festivals -->
-    <div v-if="filteredFestivals.length > 0" class="uk-margin-top">
-      <h2 class="uk-heading-divider">
-        Festivals trouvés ({{ filteredFestivals.length }})
-      </h2>
+    <div v-if="filteredFestivals.length > 0" class="uk-margin-large-top">
+      <div class="uk-flex uk-flex-middle uk-flex-between uk-margin-medium-bottom">
+        <h2 class="uk-heading-bullet uk-margin-remove">
+          <span uk-icon="happy" class="uk-margin-small-right"></span>
+          {{ filteredFestivals.length }} festivals trouvés
+        </h2>
+        <div v-if="loading">
+          <span class="uk-margin-small-right" uk-spinner></span>
+          <span class="uk-text-meta">Chargement...</span>
+        </div>
+      </div>
       
-      <div class="uk-child-width-1-1@s uk-child-width-1-2@m uk-child-width-1-3@l" uk-grid>
+      <div class="uk-child-width-1-1@s uk-child-width-1-2@m uk-child-width-1-3@xl uk-grid-match" uk-grid>
         <div v-for="festival in filteredFestivals" :key="festival.identifiant">
-          <div class="uk-card uk-card-default uk-card-hover">
-            <div class="uk-card-header">
-              <h3 class="uk-card-title uk-margin-remove-bottom">
-                {{ festival.nom_du_festival }}
-              </h3>
-              <p class="uk-text-meta uk-margin-remove-top">
-                <span uk-icon="location"></span> 
-                {{ festival.commune_principale_de_deroulement }}, 
-                {{ festival.region_principale_de_deroulement }}
-              </p>
-            </div>
-            
-            <div class="uk-card-body">
-              <div class="uk-grid-small uk-margin-small" uk-grid>
+          <div class="uk-card uk-card-default uk-card-hover uk-card-small">
+            <!-- Header -->
+            <div class="uk-card-header uk-background-muted">
+              <div class="uk-grid-small uk-flex-middle" uk-grid>
+                <div class="uk-width-expand">
+                  <h3 class="uk-card-title uk-margin-remove-bottom uk-text-truncate">
+                    <span uk-icon="star" class="uk-margin-small-right uk-text-warning"></span>
+                    {{ festival.nom_du_festival }}
+                  </h3>
+                  <p class="uk-text-meta uk-margin-remove-top">
+                    <span uk-icon="location" class="uk-margin-small-right"></span> 
+                    {{ festival.commune_principale_de_deroulement }}
+                    <span v-if="festival.region_principale_de_deroulement" class="uk-text-muted">
+                      • {{ festival.region_principale_de_deroulement }}
+                    </span>
+                  </p>
+                </div>
                 <div class="uk-width-auto">
-                  <span class="uk-label uk-label-success">
+                  <span class="uk-label uk-label-success" v-if="festival.discipline_dominante">
                     {{ festival.discipline_dominante }}
                   </span>
                 </div>
-                <div class="uk-width-auto" v-if="festival.annee_de_creation_du_festival && festival.annee_de_creation_du_festival !== '01/01/1998 00:00' && festival.annee_de_creation_du_festival !== '01/01/2011 00:00' && festival.annee_de_creation_du_festival !== '01/01/2015 00:00' && festival.annee_de_creation_du_festival !== '01/01/2016 00:00'">
-                  <span class="uk-label">
-                    Créé en {{ festival.annee_de_creation_du_festival }}
+              </div>
+            </div>
+            
+            <!-- Body -->
+            <div class="uk-card-body uk-card-small">
+              <!-- Période -->
+              <div class="uk-grid-small uk-margin-small" uk-grid>
+                <div class="uk-width-1-1" v-if="festival.periode_principale_de_deroulement_du_festival">
+                  <div class="uk-flex uk-flex-middle">
+                    <span uk-icon="calendar" class="uk-margin-small-right uk-text-muted"></span>
+                    <span class="uk-text-small uk-text-emphasis">
+                      {{ festival.periode_principale_de_deroulement_du_festival }}
+                    </span>
+                  </div>
+                </div>
+                
+                <div class="uk-width-1-2" v-if="festival.annee_de_creation_du_festival && festival.annee_de_creation_du_festival !== '01/01/1998 00:00' && festival.annee_de_creation_du_festival !== '01/01/2011 00:00' && festival.annee_de_creation_du_festival !== '01/01/2015 00:00' && festival.annee_de_creation_du_festival !== '01/01/2016 00:00'">
+                  <span class="uk-label uk-label-warning">
+                    <span uk-icon="history" class="uk-margin-small-right"></span>
+                    {{ festival.annee_de_creation_du_festival }}
                   </span>
                 </div>
-                <div class="uk-width-auto" v-else-if="festival.decennie_de_creation_du_festival">
-                  <span class="uk-label">
+                <div class="uk-width-1-2" v-else-if="festival.decennie_de_creation_du_festival">
+                  <span class="uk-label uk-label-warning">
+                    <span uk-icon="history" class="uk-margin-small-right"></span>
                     {{ festival.decennie_de_creation_du_festival }}
                   </span>
                 </div>
               </div>
               
-              <div v-if="festival.periode_principale_de_deroulement_du_festival" class="uk-margin-small">
-                <p class="uk-text-small">
-                  <span uk-icon="calendar"></span>
-                  {{ festival.periode_principale_de_deroulement_du_festival }}
-                </p>
-              </div>
-              
+              <!-- Sous-catégories -->
               <div v-if="festival.sous_categorie_musique || festival.sous_categorie_spectacle_vivant || festival.sous_categorie_cinema_et_audiovisuel" class="uk-margin-small">
-                <p class="uk-text-small uk-text-muted">
-                  {{ festival.sous_categorie_musique || festival.sous_categorie_spectacle_vivant || festival.sous_categorie_cinema_et_audiovisuel }}
-                </p>
+                <div class="uk-flex uk-flex-middle">
+                  <span uk-icon="tag" class="uk-margin-small-right uk-text-muted"></span>
+                  <span class="uk-text-small uk-text-muted">
+                    {{ festival.sous_categorie_musique || festival.sous_categorie_spectacle_vivant || festival.sous_categorie_cinema_et_audiovisuel }}
+                  </span>
+                </div>
               </div>
             </div>
             
+            <!-- Footer -->
             <div class="uk-card-footer" v-if="festival.site_internet_du_festival || festival.adresse_e_mail">
-              <div class="uk-button-group">
-                <a 
-                  v-if="festival.site_internet_du_festival" 
-                  :href="getValidUrl(festival.site_internet_du_festival)" 
-                  target="_blank" 
-                  class="uk-button uk-button-text"
-                >
-                  <span uk-icon="world"></span> Site web
-                </a>
-                <a 
-                  v-if="festival.adresse_e_mail" 
-                  :href="`mailto:${festival.adresse_e_mail}`" 
-                  class="uk-button uk-button-text"
-                >
-                  <span uk-icon="mail"></span> Contact
-                </a>
+              <div class="uk-grid-small" uk-grid>
+                <div class="uk-width-auto" v-if="festival.site_internet_du_festival">
+                  <a 
+                    :href="getValidUrl(festival.site_internet_du_festival)" 
+                    target="_blank" 
+                    class="uk-button uk-button-primary uk-button-small"
+                  >
+                    <span uk-icon="world" class="uk-margin-small-right"></span>
+                    Site web
+                  </a>
+                </div>
+                <div class="uk-width-auto" v-if="festival.adresse_e_mail">
+                  <a 
+                    :href="`mailto:${festival.adresse_e_mail}`" 
+                    class="uk-button uk-button-default uk-button-small"
+                  >
+                    <span uk-icon="mail" class="uk-margin-small-right"></span>
+                    Contact
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -273,10 +359,12 @@
     <!-- Message si pas de festivals -->
     <div v-else-if="!loading && festivals.length === 0 && !error" class="uk-margin-top">
       <div class="uk-alert-primary" uk-alert>
-        <p>Cliquez sur le bouton pour charger les festivals depuis l'API du Ministère de la Culture.</p>
+        <p>Les festivals se chargent automatiquement...</p>
       </div>
     </div>
-  </div>
+    
+    </div> <!-- Fermeture uk-container -->
+  </div> <!-- Fermeture festivals-page -->
 </template>
 
 <script>
@@ -823,6 +911,12 @@ export default {
     const cleanup = () => {
       clearInterval(logUpdateInterval);
     };
+
+    // Chargement automatique des festivals au montage du composant
+    onMounted(() => {
+      logger.info('🚀 FestivalsPage mounted, auto-loading festivals...');
+      fetchFestivals(1);
+    });
     
     // Retour avec cleanup
     return {
@@ -864,161 +958,33 @@ export default {
 </script>
 
 <style scoped>
-.festivals-page {
-  padding: 20px;
-}
-
-h1 {
-  color: #2c3e50;
-  margin-bottom: 20px;
-  text-align: center;
-}
-
-.uk-card-title {
-  font-size: 1.1rem;
-  margin-bottom: 5px;
-  color: #1e87f0;
-}
-
-.uk-label {
-  font-size: 0.75rem;
-}
-
-.uk-label-success {
-  background: #32d296;
-}
-
-.uk-card {
-  transition: all 0.3s ease;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.uk-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-}
-
-.uk-card-body {
-  flex-grow: 1;
-}
-
-.uk-card-footer {
-  background: #f8f9fa;
-  border-top: 1px solid #e5e5e5;
-  margin-top: auto;
-}
-
-.uk-text-meta {
-  font-size: 0.875rem;
-}
-
-.uk-button-group .uk-button {
-  font-size: 0.875rem;
-}
-
-/* Styles de pagination */
-.uk-pagination a {
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.uk-pagination a:hover {
-  background: #1e87f0;
-  color: white;
-  text-decoration: none;
-}
-
-.uk-pagination .uk-active a {
-  background: #1e87f0;
-  color: white;
-}
-
-.uk-form-width-small {
-  width: 80px;
-}
-
-.uk-button-small {
-  padding: 0 15px;
-  line-height: 28px;
-  min-height: 30px;
-}
-
-/* Styles pour la recherche */
-.uk-inline .uk-form-icon {
-  color: #999;
-  cursor: pointer;
-}
-
-.uk-inline .uk-form-icon:hover {
-  color: #666;
-}
-
-/* Styles pour les logs */
+/* Minimal custom styles - using UIkit utilities for design */
 .logs-container {
   max-height: 400px;
   overflow-y: auto;
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  background: #1e1e1e;
-  color: #ffffff;
-  padding: 15px;
-  border-radius: 4px;
+  font-family: monospace;
 }
 
 .log-entry {
-  margin-bottom: 8px;
-  padding: 4px 0;
-  border-left: 3px solid transparent;
-  padding-left: 8px;
-}
-
-.log-debug {
-  border-left-color: #6c757d;
-  color: #adb5bd;
-}
-
-.log-info {
-  border-left-color: #0dcaf0;
-  color: #b3f0ff;
-}
-
-.log-warn {
-  border-left-color: #ffc107;
-  color: #fff3cd;
-}
-
-.log-error {
-  border-left-color: #dc3545;
-  color: #f8d7da;
-}
-
-.log-time {
-  color: #6c757d;
-  margin-right: 8px;
-}
-
-.log-level {
-  font-weight: bold;
-  margin-right: 8px;
-  min-width: 60px;
-  display: inline-block;
-}
-
-.log-message {
-  margin-right: 8px;
-}
-
-.log-data {
-  background: #2d2d2d;
-  border: 1px solid #444;
-  border-radius: 3px;
   padding: 8px;
-  margin: 4px 0;
+  margin-bottom: 4px;
+  border-left: 3px solid transparent;
+}
+
+.log-debug { border-left-color: #999; }
+.log-info { border-left-color: #1e87f0; }
+.log-warn { border-left-color: #faa05a; }
+.log-error { border-left-color: #f0506e; }
+
+.log-time { color: #999; }
+.log-level { font-weight: bold; }
+.log-data { 
+  background: #f8f9fa; 
+  padding: 8px; 
+  margin: 4px 0; 
+  border-radius: 4px; 
   font-size: 11px;
-  color: #e6db74;
-  max-height: 150px;
+  max-height: 120px;
   overflow-y: auto;
 }
 </style>
