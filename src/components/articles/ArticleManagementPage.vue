@@ -2,6 +2,57 @@
   <div class="uk-container uk-margin-top">
     <h1 class="uk-heading-primary">Gestion des Articles</h1>
 
+    <div v-if="!loading && !error" class="uk-margin-bottom">
+      <button @click="openCreateModal" class="uk-button uk-button-primary">
+        <span uk-icon="icon: plus"></span>
+        Créer un article
+      </button>
+    </div>
+
+    <!-- Modal de création d'article -->
+    <div id="create-article-modal" uk-modal>
+      <div class="uk-modal-dialog uk-modal-body">
+        <h2 class="uk-modal-title">Créer un nouvel article</h2>
+        <form @submit.prevent="createArticle">
+          <div class="uk-margin">
+            <label class="uk-form-label" for="new-title">Titre</label>
+            <div class="uk-form-controls">
+              <input class="uk-input" id="new-title" type="text" v-model="newArticle.title" required>
+            </div>
+          </div>
+
+          <div class="uk-margin">
+            <label class="uk-form-label" for="new-desc">Description</label>
+            <div class="uk-form-controls">
+              <textarea class="uk-textarea" id="new-desc" v-model="newArticle.desc" rows="5" required></textarea>
+            </div>
+          </div>
+
+          <div class="uk-margin">
+            <label class="uk-form-label" for="new-author">Auteur</label>
+            <div class="uk-form-controls">
+              <input class="uk-input" id="new-author" type="text" v-model="newArticle.author" required>
+            </div>
+          </div>
+
+          <div class="uk-margin">
+            <label class="uk-form-label" for="new-imgPath">URL de l'image (optionnel)</label>
+            <div class="uk-form-controls">
+              <input class="uk-input" id="new-imgPath" type="text" v-model="newArticle.imgPath" placeholder="https://example.com/image.jpg">
+            </div>
+          </div>
+
+          <p class="uk-text-right">
+            <button class="uk-button uk-button-default uk-modal-close" type="button">Annuler</button>
+            <button class="uk-button uk-button-primary uk-margin-small-left" type="submit" :disabled="creating">
+              <span v-if="creating" uk-spinner="ratio: 0.8"></span>
+              <span v-else>Créer</span>
+            </button>
+          </p>
+        </form>
+      </div>
+    </div>
+
     <div v-if="loading" class="uk-text-center">
       <span uk-spinner="ratio: 2"></span>
       <p>Chargement des articles...</p>
@@ -50,6 +101,13 @@ import logger from '../../utils/logger';
 const articles = ref([]);
 const loading = ref(true);
 const error = ref(null);
+const creating = ref(false);
+const newArticle = ref({
+  title: '',
+  desc: '',
+  author: '',
+  imgPath: ''
+});
 
 const fetchArticles = async () => {
   try {
@@ -73,6 +131,64 @@ const fetchArticles = async () => {
     error.value = err.message;
   } finally {
     loading.value = false;
+  }
+};
+
+const openCreateModal = () => {
+  // Reset form
+  newArticle.value = {
+    title: '',
+    desc: '',
+    author: '',
+    imgPath: ''
+  };
+  // Open modal
+  UIkit.modal('#create-article-modal').show();
+};
+
+const closeCreateModal = () => {
+  UIkit.modal('#create-article-modal').hide();
+};
+
+const createArticle = async () => {
+  creating.value = true;
+  const token = localStorage.getItem('token');
+  logger.info('Creating new article.');
+
+  // Utiliser une image placeholder si aucune URL n'est fournie
+  const articleData = {
+    ...newArticle.value,
+  };
+  if (!articleData.imgPath || articleData.imgPath.trim() === '') {
+    articleData.imgPath = 'https://placehold.co/400x200';
+  }
+
+  try {
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/articles/save`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(articleData)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to create article.');
+    }
+
+    logger.info('Article created successfully.');
+    UIkit.notification({ message: 'Article créé avec succès !', status: 'success', pos: 'top-center' });
+    closeCreateModal();
+    // Refresh the list
+    await fetchArticles();
+  } catch (err) {
+    logger.error('Error creating article:', err);
+    UIkit.notification({ message: err.message, status: 'danger', pos: 'top-center' });
+  } finally {
+    creating.value = false;
   }
 };
 

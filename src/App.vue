@@ -3,8 +3,12 @@
     <!-- Navigation -->
     <nav class="uk-navbar-container uk-flex" uk-navbar v-if="isLoggedIn">
         <ul class="uk-navbar-nav uk-padding">
-          <li class="uk-active"><router-link to="/articles">Liste des Articles</router-link></li>
-          <li><router-link to="/articles/management">Gestion des Articles</router-link></li>
+          <li :class="{ 'uk-active': $route.path === '/articles' }">
+            <router-link to="/articles">Liste des Articles</router-link>
+          </li>
+          <li :class="{ 'uk-active': $route.path === '/articles/management' }">
+            <router-link to="/articles/management">Gestion des Articles</router-link>
+          </li>
         </ul>
         <ul class="uk-navbar-nav uk-padding">
           <li>
