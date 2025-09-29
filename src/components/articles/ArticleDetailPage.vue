@@ -40,7 +40,6 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import UIkit from 'uikit';
-import logger from '../../utils/logger';
 
 const route = useRoute();
 const router = useRouter();
@@ -81,16 +80,12 @@ const confirmDelete = () => {
       () => {
         deleteArticle();
       },
-      () => {
-        logger.info('Article deletion cancelled by user.');
-      }
     );
 };
 
 const deleteArticle = async () => {
   loading.value = true;
   const token = localStorage.getItem('token');
-  logger.info(`Deleting article ${article.value.id}.`);
 
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/articles/${article.value.id}`, {
@@ -105,7 +100,6 @@ const deleteArticle = async () => {
       throw new Error(errorData || 'Failed to delete article.');
     }
 
-    logger.info('Article deleted successfully.');
     UIkit.notification({
       message: 'Article supprimé avec succès !',
       status: 'success',
@@ -113,7 +107,6 @@ const deleteArticle = async () => {
     });
     router.push({ name: 'ArticlesList' });
   } catch (err) {
-    logger.error('Error deleting article:', err);
     UIkit.notification({ message: err.message, status: 'danger', pos: 'top-center' });
   } finally {
     loading.value = false;

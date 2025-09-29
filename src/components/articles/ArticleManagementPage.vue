@@ -135,7 +135,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import UIkit from 'uikit';
-import logger from '../../utils/logger';
 
 const articles = ref([]);
 const loading = ref(true);
@@ -164,9 +163,7 @@ const fetchArticles = async () => {
 
     const data = await response.json();
     articles.value = data.data;
-    logger.info(`Fetched ${articles.value.length} articles for management.`);
   } catch (err) {
-    logger.error('Error fetching articles:', err);
     error.value = err.message;
   } finally {
     loading.value = false;
@@ -191,7 +188,6 @@ const closeCreateModal = () => {
 const createArticle = async () => {
   creating.value = true;
   const token = localStorage.getItem('token');
-  logger.info('Creating new article.');
 
   const articleData = {
     ...newArticle.value,
@@ -216,7 +212,6 @@ const createArticle = async () => {
       throw new Error(data.message || 'Failed to create article.');
     }
 
-    logger.info('Article created successfully.');
     UIkit.notification({
       message: 'Article créé avec succès !',
       status: 'success',
@@ -226,7 +221,6 @@ const createArticle = async () => {
 
     await fetchArticles();
   } catch (err) {
-    logger.error('Error creating article:', err);
     UIkit.notification({ message: err.message, status: 'danger', pos: 'top-center' });
   } finally {
     creating.value = false;
@@ -242,16 +236,12 @@ const confirmDelete = article => {
       () => {
         deleteArticle(article.id);
       },
-      () => {
-        logger.info(`Article deletion cancelled for article ${article.id}.`);
-      }
     );
 };
 
 const deleteArticle = async articleId => {
   loading.value = true;
   const token = localStorage.getItem('token');
-  logger.info(`Deleting article ${articleId}.`);
 
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/articles/${articleId}`, {
@@ -266,7 +256,6 @@ const deleteArticle = async articleId => {
       throw new Error(errorData || 'Failed to delete article.');
     }
 
-    logger.info('Article deleted successfully.');
     UIkit.notification({
       message: 'Article supprimé avec succès !',
       status: 'success',
@@ -275,7 +264,6 @@ const deleteArticle = async articleId => {
 
     await fetchArticles();
   } catch (err) {
-    logger.error('Error deleting article:', err);
     UIkit.notification({ message: err.message, status: 'danger', pos: 'top-center' });
   } finally {
     loading.value = false;

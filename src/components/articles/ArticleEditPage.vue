@@ -56,7 +56,6 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import UIkit from 'uikit';
-import logger from '../../utils/logger';
 
 const route = useRoute();
 const router = useRouter();
@@ -90,10 +89,8 @@ const updateArticle = async () => {
   error.value = null;
   const token = localStorage.getItem('token');
   const apiUrl = import.meta.env.VITE_API_URL;
-  logger.info(`Starting update process for article ${articleId}.`);
 
   try {
-    logger.debug('Step 1: Saving the new article data.');
     const saveResponse = await fetch(`${apiUrl}/articles/save`, {
       method: 'POST',
       headers: {
@@ -112,9 +109,6 @@ const updateArticle = async () => {
     if (!saveResponse.ok) {
       throw new Error(saveData.message || 'Failed to save the new article.');
     }
-    logger.info('Step 1 successful: New article saved.');
-
-    logger.debug(`Step 2: Deleting the old article ${articleId}.`);
     const deleteResponse = await fetch(`${apiUrl}/articles/${articleId}`, {
       method: 'DELETE',
       headers: {
@@ -122,14 +116,6 @@ const updateArticle = async () => {
       },
     });
 
-    if (!deleteResponse.ok) {
-      const deleteData = await deleteResponse.json();
-      logger.warn(
-        `Failed to delete the old article, but the new one was saved. Reason: ${deleteData.message}`
-      );
-    } else {
-      logger.info('Step 2 successful: Old article deleted.');
-    }
 
     UIkit.notification({
       message: 'Article mis à jour avec succès !',
@@ -138,7 +124,6 @@ const updateArticle = async () => {
     });
     router.push({ name: 'ArticlesList' });
   } catch (err) {
-    logger.error('An error occurred during the update process:', err);
     error.value = err.message;
     UIkit.notification({ message: err.message, status: 'danger', pos: 'top-center' });
   } finally {
