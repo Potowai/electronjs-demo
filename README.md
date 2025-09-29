@@ -57,15 +57,15 @@ Vous pouvez également installer l'application en téléchargeant la dernière r
 Téléchargez le fichier exécutable correspondant à votre système d'exploitation et suivez les instructions d'installation.
 
 1. Clonez le dépôt :
-   ```sh
-git clone <url-du-repo>
+```sh
+git clone http://github.com/Potowai/electronjs-demo
 ```
 2. Installez les dépendances :
-   ```sh
+```sh
 npm install
 ```
 3. Lancez l'application :
-   ```sh
+```sh
 npm run start
 ```
 

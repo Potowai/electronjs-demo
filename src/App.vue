@@ -88,7 +88,10 @@ export default {
       // Redirection vers /login si pas connecté
       if (!localStorage.getItem('token') && route.path !== '/login' && route.path !== '/signup') {
         router.replace('/login');
-      } else if (localStorage.getItem('token') && (route.path === '/login' || route.path === '/signup')) {
+      } else if (
+        localStorage.getItem('token') &&
+        (route.path === '/login' || route.path === '/signup')
+      ) {
         router.replace('/');
       }
     };
