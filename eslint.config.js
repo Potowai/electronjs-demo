@@ -3,13 +3,13 @@ import vue from 'eslint-plugin-vue';
 import prettierConfig from '@vue/eslint-config-prettier';
 
 export default [
-  // Configuration de base pour JavaScript
+
   js.configs.recommended,
 
-  // Configuration pour Vue.js
+
   ...vue.configs['flat/essential'],
 
-  // Configuration Prettier
+
   prettierConfig,
 
   {
@@ -22,7 +22,7 @@ export default [
     ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**', '**/node_modules/**'],
   },
 
-  // Configuration pour les fichiers Vue (environnement browser)
+
   {
     name: 'app/vue-files',
     files: ['**/*.vue'],
@@ -38,7 +38,7 @@ export default [
     },
   },
 
-  // Configuration pour main.js (environnement Node.js)
+
   {
     name: 'app/main-files',
     files: ['src/main.js'],
@@ -58,7 +58,7 @@ export default [
     },
   },
 
-  // Configuration pour preload.js (environnement Node.js avec Electron)
+
   {
     name: 'app/preload-files',
     files: ['src/preload.js'],
@@ -71,14 +71,14 @@ export default [
         exports: 'readonly',
         global: 'readonly',
         Buffer: 'readonly',
-        // APIs Electron
+
         contextBridge: 'readonly',
         ipcRenderer: 'readonly',
       },
     },
   },
 
-  // Configuration pour renderer.js (environnement browser)
+
   {
     name: 'app/renderer-files',
     files: ['src/renderer.js'],
@@ -93,7 +93,7 @@ export default [
     },
   },
 
-  // Configuration pour les utilitaires (environnement Node.js/browser mixte)
+
   {
     name: 'app/utils-files',
     files: ['src/utils/**/*.js'],
@@ -108,7 +108,7 @@ export default [
     },
   },
 
-  // Configuration pour le router (environnement browser)
+
   {
     name: 'app/router-files',
     files: ['src/router/**/*.js'],
@@ -123,10 +123,10 @@ export default [
 
   {
     rules: {
-      // Règles personnalisées
-      'vue/multi-word-component-names': 'off', // Désactiver pour les composants simples
-      'no-unused-vars': 'warn', // Avertissement au lieu d'erreur
-      'no-console': 'off', // Permettre console.log en développement
+
+      'vue/multi-word-component-names': 'off',
+      'no-unused-vars': 'warn',
+      'no-console': 'off',
       'prefer-const': 'error',
       'no-var': 'error',
     },

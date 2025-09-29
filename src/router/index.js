@@ -5,6 +5,7 @@ import ArticlesListPage from '../components/articles/ArticlesListPage.vue';
 import ArticleDetailPage from '../components/articles/ArticleDetailPage.vue';
 import ArticleEditPage from '../components/articles/ArticleEditPage.vue';
 import ArticleManagementPage from '../components/articles/ArticleManagementPage.vue';
+import logger from '../utils/logger.js';
 
 const routes = [
   {
@@ -55,9 +56,12 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
+  logger.debug('Router navigation', { from: from.path, to: to.path });
+
   const loggedIn = localStorage.getItem('token');
 
   if (to.matched.some(record => record.meta.requiresAuth) && !loggedIn) {
+    logger.info('Redirecting to login - authentication required');
     next('/login');
   } else {
     next();

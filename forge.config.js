@@ -78,7 +78,7 @@ module.exports = {
           name: 'electronjs-demo'
         },
         prerelease: false,
-        draft: true
+        draft: false
       }
     }
   ]

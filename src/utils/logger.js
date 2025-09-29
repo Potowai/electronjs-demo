@@ -1,66 +1,70 @@
+import log from 'electron-log';
+import path from 'path';
+
+log.transports.file.level = 'debug';
+log.transports.console.level = 'debug';
+
+log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}';
+log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}';
+
+log.transports.file.fileName = 'electron-demo.log';
+log.transports.file.maxSize = 10485760;
+log.transports.file.archiveLogFn = file => {
+  const info = path.parse(file);
+  return `${info.name}.old${info.ext}`;
+};
+
 class Logger {
   constructor() {
-    this.logLevel = 'DEBUG';
-    this.logs = [];
-  }
-
-  formatMessage(level, message, data = null) {
-    const timestamp = new Date().toISOString();
-    const formattedMessage = `[${timestamp}] [${level}] ${message}`;
-
-    if (data) {
-      console.log(formattedMessage, data);
-      this.logs.push({ timestamp, level, message, data });
-    } else {
-      console.log(formattedMessage);
-      this.logs.push({ timestamp, level, message });
-    }
+    this.logLevel = 'debug';
   }
 
   debug(message, data = null) {
-    if (this.shouldLog('DEBUG')) {
-      this.formatMessage('DEBUG', message, data);
+    if (data) {
+      log.debug(message, data);
+    } else {
+      log.debug(message);
     }
   }
 
   info(message, data = null) {
-    if (this.shouldLog('INFO')) {
-      this.formatMessage('INFO', message, data);
+    if (data) {
+      log.info(message, data);
+    } else {
+      log.info(message);
     }
   }
 
   warn(message, data = null) {
-    if (this.shouldLog('WARN')) {
-      this.formatMessage('WARN', message, data);
+    if (data) {
+      log.warn(message, data);
+    } else {
+      log.warn(message);
     }
   }
 
   error(message, data = null) {
-    if (this.shouldLog('ERROR')) {
-      this.formatMessage('ERROR', message, data);
+    if (data) {
+      log.error(message, data);
+    } else {
+      log.error(message);
     }
   }
 
-  shouldLog(level) {
-    const levels = ['DEBUG', 'INFO', 'WARN', 'ERROR'];
-    return levels.indexOf(level) >= levels.indexOf(this.logLevel);
-  }
-
-  getLogs() {
-    return this.logs;
-  }
-
-  clearLogs() {
-    this.logs = [];
+  logError(error, context = {}) {
+    log.error('Error occurred:', {
+      message: error.message,
+      stack: error.stack,
+      context,
+    });
   }
 
   logHttpRequest(method, url, options = {}) {
-    this.info(`🌐 HTTP ${method} Request`, {
+    log.info(`🌐 HTTP ${method} Request`, {
       url,
       options: {
         ...options,
-
-        headers: options.headers ? { ...options.headers } : undefined,
+        headers: options.headers ? this.sanitizeHeaders(options.headers) : undefined,
       },
     });
   }
@@ -69,32 +73,75 @@ class Logger {
     const status = response.status;
     const statusText = response.statusText;
 
+    const logData = {
+      url,
+      status,
+      statusText,
+      duration: `${duration}ms`,
+    };
+
     if (status >= 200 && status < 300) {
-      this.info(`✅ HTTP ${method} Success (${duration}ms)`, {
-        url,
-        status,
-        statusText,
-      });
+      log.info(`✅ HTTP ${method} Success`, logData);
     } else if (status >= 400) {
-      this.error(`❌ HTTP ${method} Error (${duration}ms)`, {
-        url,
-        status,
-        statusText,
-      });
+      log.error(`❌ HTTP ${method} Error`, logData);
     } else {
-      this.warn(`⚠️ HTTP ${method} Warning (${duration}ms)`, {
-        url,
-        status,
-        statusText,
-      });
+      log.warn(`⚠️ HTTP ${method} Warning`, logData);
     }
   }
 
   logApiError(endpoint, error, context = {}) {
-    this.error(`🚨 API Error on ${endpoint}`, {
+    log.error(`🚨 API Error on ${endpoint}`, {
       error: error.message,
       stack: error.stack,
       context,
+    });
+  }
+
+  logAuth(action, success = true, details = {}) {
+    const level = success ? 'info' : 'warn';
+    const icon = success ? '🔐' : '🚫';
+    const status = success ? 'Success' : 'Failed';
+
+    log[level](`${icon} Auth ${action} ${status}`, details);
+  }
+
+  logCrud(operation, entity, id, success = true, details = {}) {
+    const level = success ? 'info' : 'error';
+    const icon = success ? '✅' : '❌';
+    const status = success ? 'Success' : 'Failed';
+
+    log[level](`${icon} ${operation} ${entity} ${status}`, {
+      id,
+      ...details,
+    });
+  }
+
+  sanitizeHeaders(headers) {
+    const sanitized = { ...headers };
+    const sensitiveKeys = ['authorization', 'x-api-key', 'cookie'];
+
+    sensitiveKeys.forEach(key => {
+      if (sanitized[key]) {
+        sanitized[key] = '[REDACTED]';
+      }
+    });
+
+    return sanitized;
+  }
+
+  getLogFilePath() {
+    return log.transports.file.getFile().path;
+  }
+
+  logAppEvent(event, details = {}) {
+    log.info(`📱 App Event: ${event}`, details);
+  }
+
+  logUnhandledError(error, origin = 'unknown') {
+    log.error(`� Unhandled Error from ${origin}`, {
+      message: error.message,
+      stack: error.stack,
+      origin,
     });
   }
 }
