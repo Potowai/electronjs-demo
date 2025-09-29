@@ -232,11 +232,9 @@ const confirmDelete = article => {
     .confirm(
       `Êtes-vous sûr de vouloir supprimer l'article "${article.title}" ? Cette action est irréversible.`
     )
-    .then(
-      () => {
-        deleteArticle(article.id);
-      },
-    );
+    .then(() => {
+      deleteArticle(article.id);
+    });
 };
 
 const deleteArticle = async articleId => {

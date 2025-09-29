@@ -116,7 +116,6 @@ const updateArticle = async () => {
       },
     });
 
-
     UIkit.notification({
       message: 'Article mis à jour avec succès !',
       status: 'success',

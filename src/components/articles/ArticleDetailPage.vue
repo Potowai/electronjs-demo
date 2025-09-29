@@ -76,11 +76,9 @@ const fetchArticle = async () => {
 const confirmDelete = () => {
   UIkit.modal
     .confirm('Êtes-vous sûr de vouloir supprimer cet article ? Cette action est irréversible.')
-    .then(
-      () => {
-        deleteArticle();
-      },
-    );
+    .then(() => {
+      deleteArticle();
+    });
 };
 
 const deleteArticle = async () => {

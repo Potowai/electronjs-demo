@@ -39,15 +39,6 @@
             <router-link to="/signup">Pas encore de compte ? S'inscrire</router-link>
           </div>
         </form>
-
-        <!-- Indice pour le développement -->
-        <div v-if="isDev" class="uk-alert-primary uk-margin-top" uk-alert>
-          <p class="uk-text-small">
-            <strong>Pour le test :</strong><br />
-            Email: <code>isaac@gmail.com</code><br />
-            Mot de passe: <code>password</code>
-          </p>
-        </div>
       </div>
     </div>
   </div>
@@ -65,8 +56,6 @@ export default {
     const loading = ref(false);
     const error = ref(null);
     const router = useRouter();
-
-    const isDev = computed(() => import.meta.env.DEV);
 
     const login = async () => {
       loading.value = true;
@@ -106,7 +95,6 @@ export default {
       loading,
       error,
       login,
-      isDev,
     };
   },
 };
