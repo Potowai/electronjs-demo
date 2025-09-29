@@ -58,7 +58,7 @@ Téléchargez le fichier exécutable correspondant à votre système d'exploitat
 
 1. Clonez le dépôt :
    ```sh
-git clone <url-du-repo>
+git clone http://github.com/Potowai/electronjs-demo
 ```
 2. Installez les dépendances :
    ```sh
