@@ -254,10 +254,10 @@ function requireBrowser() {
       if (typeof window !== "undefined" && window.process && window.process.type === "renderer") {
         return true;
       }
-      return typeof document !== "undefined" && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance ||
-      typeof window !== "undefined" && window.console && (window.console.firebug || window.console.exception && window.console.table) ||
-
-      typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31 ||
+      return typeof document !== "undefined" && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance || // is firebug? http://stackoverflow.com/a/398120/376773
+      typeof window !== "undefined" && window.console && (window.console.firebug || window.console.exception && window.console.table) || // is firefox >= v31?
+      // https://developer.mozilla.org/en-US/docs/Tools/Web_Console#Styling_messages
+      typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31 || // double check webkit in userAgent just in case we are in a worker
       typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
     }
     exports.formatters.j = function(v) {
@@ -1397,11 +1397,11 @@ function requireNodeExternalApi() {
     }
     setPreloadFileForSessions({
       filePath,
-
+      // eslint-disable-line no-unused-vars
       includeFutureSession = true,
-
+      // eslint-disable-line no-unused-vars
       getSessions = () => []
-
+      // eslint-disable-line no-unused-vars
     }) {
     }
     /**
@@ -1890,7 +1890,7 @@ function requireEventLogger() {
           "render-process-gone": true
         },
         webContents: {
-
+          // 'console-message': true,
           "did-fail-load": true,
           "did-fail-provisional-load": true,
           "plugin-crashed": true,
@@ -3022,21 +3022,24 @@ if (isRenderer) {
 }
 var srcExports = src.exports;
 const log = /* @__PURE__ */ getDefaultExportFromCjs(srcExports);
-log.transports.file.level = "debug";
-log.transports.console.level = "debug";
-log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
-log.transports.console.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
-log.transports.file.fileName = "electron-demo.log";
-log.transports.file.maxSize = 10485760;
-log.transports.file.archiveLogFn = (file2) => {
-  const info = require$$2.parse(file2);
-  return `${info.name}.old${info.ext}`;
-};
+if (log && log.transports && log.transports.file) {
+  log.transports.file.level = "debug";
+  log.transports.console.level = "debug";
+  log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
+  log.transports.console.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}";
+  log.transports.file.fileName = "electron-demo.log";
+  log.transports.file.maxSize = 10485760;
+  log.transports.file.archiveLogFn = (file2) => {
+    const info = require$$2.parse(file2);
+    return `${info.name}.old${info.ext}`;
+  };
+} else {
+  console.warn("electron-log transports not available, using console fallback");
+}
 class Logger {
   constructor() {
     this.logLevel = "debug";
   }
-
   debug(message, data = null) {
     if (data) {
       log.debug(message, data);
@@ -3065,7 +3068,6 @@ class Logger {
       log.error(message);
     }
   }
-
   logError(error, context = {}) {
     log.error("Error occurred:", {
       message: error.message,
@@ -3073,7 +3075,6 @@ class Logger {
       context
     });
   }
-
   logHttpRequest(method, url, options = {}) {
     log.info(`🌐 HTTP ${method} Request`, {
       url,
@@ -3100,7 +3101,6 @@ class Logger {
       log.warn(`⚠️ HTTP ${method} Warning`, logData);
     }
   }
-
   logApiError(endpoint, error, context = {}) {
     log.error(`🚨 API Error on ${endpoint}`, {
       error: error.message,
@@ -3108,14 +3108,12 @@ class Logger {
       context
     });
   }
-
   logAuth(action, success = true, details = {}) {
     const level = success ? "info" : "warn";
     const icon = success ? "🔐" : "🚫";
     const status = success ? "Success" : "Failed";
     log[level](`${icon} Auth ${action} ${status}`, details);
   }
-
   logCrud(operation, entity, id, success = true, details = {}) {
     const level = success ? "info" : "error";
     const icon = success ? "✅" : "❌";
@@ -3125,7 +3123,6 @@ class Logger {
       ...details
     });
   }
-
   sanitizeHeaders(headers) {
     const sanitized = { ...headers };
     const sensitiveKeys = ["authorization", "x-api-key", "cookie"];
@@ -3136,15 +3133,12 @@ class Logger {
     });
     return sanitized;
   }
-
   getLogFilePath() {
     return log.transports.file.getFile().path;
   }
-
   logAppEvent(event, details = {}) {
     log.info(`📱 App Event: ${event}`, details);
   }
-
   logUnhandledError(error, origin = "unknown") {
     log.error(`� Unhandled Error from ${origin}`, {
       message: error.message,

@@ -1,18 +1,25 @@
 import log from 'electron-log';
 import path from 'path';
 
-log.transports.file.level = 'debug';
-log.transports.console.level = 'debug';
+// Configuration du logger Electron avec vérification de sécurité
+if (log && log.transports && log.transports.file) {
+  log.transports.file.level = 'debug';
+  log.transports.console.level = 'debug';
 
-log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}';
-log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}';
+  // Format personnalisé pour les logs
+  log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}';
+  log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] {text}';
 
-log.transports.file.fileName = 'electron-demo.log';
-log.transports.file.maxSize = 10485760;
-log.transports.file.archiveLogFn = file => {
-  const info = path.parse(file);
-  return `${info.name}.old${info.ext}`;
-};
+  // Configuration du fichier de log
+  log.transports.file.fileName = 'electron-demo.log';
+  log.transports.file.maxSize = 10485760;
+  log.transports.file.archiveLogFn = file => {
+    const info = path.parse(file);
+    return `${info.name}.old${info.ext}`;
+  };
+} else {
+  console.warn('electron-log transports not available, using console fallback');
+}
 
 class Logger {
   constructor() {
