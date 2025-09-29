@@ -56,7 +56,6 @@
 <script>
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
-import logger from '../../utils/logger';
 
 export default {
   name: 'LoginPage',
@@ -70,12 +69,10 @@ export default {
     const isDev = computed(() => import.meta.env.DEV);
 
     const login = async () => {
-      logger.info('Attempting to log in...');
       loading.value = true;
       error.value = null;
       try {
         const apiUrl = import.meta.env.VITE_API_URL;
-        logger.debug(`Sending login request to ${apiUrl}/login`);
         const response = await fetch(`${apiUrl}/login`, {
           method: 'POST',
           headers: {
@@ -94,11 +91,9 @@ export default {
         }
 
         localStorage.setItem('token', data.token);
-        logger.info('Login successful, token stored.');
 
         router.push('/');
       } catch (err) {
-        logger.error('Login failed:', err);
         error.value = err.message;
       } finally {
         loading.value = false;

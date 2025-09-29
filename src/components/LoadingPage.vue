@@ -1,14 +1,8 @@
 <template>
   <div id="loading">
-    <img
-      class="img"
-      src="/src/assets/images/spinner.gif"
-      alt="loading..."
-      width="200"
-    />
+    <img class="img" src="/src/assets/images/spinner.gif" alt="loading..." width="200" />
   </div>
 </template>
-
 
 <script>
 export default {
@@ -55,12 +49,12 @@ export default {
     },
   },
 };
-</script><style>
+</script>
+<style>
 #loading {
   z-index: 1000;
   background-color: white;
   text-align: center;
   line-height: 100vh;
 }
-
 </style>

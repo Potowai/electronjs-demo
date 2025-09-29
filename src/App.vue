@@ -38,7 +38,6 @@
 import { ref, watch, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import LoadingPage from './components/LoadingPage.vue';
-import logger from './utils/logger.js';
 
 export default {
   name: 'App',
@@ -58,7 +57,6 @@ export default {
     };
 
     const onLoadingComplete = () => {
-      logger.info('Application loading completed, showing main interface');
       isLoading.value = false;
     };
 
@@ -70,7 +68,7 @@ export default {
     );
 
     onMounted(() => {
-      logger.info('Vue application mounted, starting loading sequence');
+      // Vue application mounted, starting loading sequence
     });
 
     return {

@@ -1,5 +1,7 @@
 <template>
   <div class="uk-container uk-margin-top">
+    import { ref, onMounted } from 'vue'; import { useRouter, useRoute } from 'vue-router'; import
+    UIkit from 'uikit';
     <h2>Modifier l'article</h2>
     <form v-if="article" @submit.prevent="updateArticle">
       <div class="uk-margin">
@@ -67,7 +69,6 @@ const fetchArticle = async () => {
   loading.value = true;
   error.value = null;
   const token = localStorage.getItem('token');
-  logger.info(`Fetching article ${articleId} for editing.`);
 
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/articles/${articleId}`, {
@@ -76,9 +77,7 @@ const fetchArticle = async () => {
     if (!response.ok) throw new Error('Failed to fetch article data.');
     const data = await response.json();
     article.value = data.data;
-    logger.debug('Article data loaded for editing.', article.value);
   } catch (err) {
-    logger.error('Error fetching article for edit:', err);
     error.value = err.message;
     UIkit.notification({ message: err.message, status: 'danger', pos: 'top-center' });
   } finally {

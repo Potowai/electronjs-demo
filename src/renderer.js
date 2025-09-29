@@ -31,21 +31,13 @@ import './index.css';
 import UIkit from 'uikit';
 import Icons from 'uikit/dist/js/uikit-icons';
 import 'uikit/dist/css/uikit.min.css';
-import logger from './utils/logger.js';
 
 UIkit.use(Icons);
-
-logger.info('👋 Renderer process started');
 
 import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router/index.js';
 
-logger.debug('Creating Vue application');
 const app = createApp(App);
 app.use(router);
-
-logger.debug('Mounting Vue application');
 app.mount('#app');
-
-logger.info('Vue application mounted successfully');

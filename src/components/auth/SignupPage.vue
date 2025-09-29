@@ -86,7 +86,6 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import UIkit from 'uikit';
-import logger from '../../utils/logger';
 
 export default {
   name: 'SignupPage',
@@ -110,11 +109,9 @@ export default {
       }
 
       loading.value = true;
-      logger.info('Attempting to sign up...');
 
       const apiUrl = import.meta.env.VITE_API_URL;
       try {
-        logger.debug(`Sending signup request to ${apiUrl}/signup`);
         const response = await fetch(`${apiUrl}/signup`, {
           method: 'POST',
           headers: {
@@ -133,7 +130,6 @@ export default {
           throw new Error(data.message || "Erreur lors de l'inscription");
         }
 
-        logger.info('Signup successful.');
         UIkit.notification({
           message: 'Inscription réussie ! Vous pouvez maintenant vous connecter.',
           status: 'success',
@@ -143,8 +139,6 @@ export default {
 
         router.push('/login');
       } catch (err) {
-        logger.error('Signup failed:', err.message);
-
         UIkit.notification({
           message: err.message,
           status: 'danger',
