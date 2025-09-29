@@ -74,8 +74,8 @@ module.exports = {
       name: '@electron-forge/publisher-github',
       config: {
         repository: {
-          owner: 'potowai',
-          name: 'electron-demo'
+          owner: 'Potowai',
+          name: 'electronjs-demo'
         },
         prerelease: false,
         draft: true
