@@ -20,7 +20,7 @@ module.exports = {
       config: {
         options: {
           maintainer: 'Potowai',
-          homepage: 'https://github.com/potowai/electron-demo'
+          homepage: 'https://github.com/potowai/electronjs-demo'
         }
       },
     },

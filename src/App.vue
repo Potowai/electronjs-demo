@@ -49,6 +49,31 @@ export default {
     const route = useRoute();
     const isLoggedIn = ref(!!localStorage.getItem('token'));
     const isLoading = ref(true);
+    const apiAwake = ref(false);
+    let pingInterval = null;
+
+    const API_URL = import.meta.env.VITE_API_URL || '';
+
+    // Fonction pour pinger l'API
+    const pingApi = async () => {
+      try {
+        const response = await fetch(`${API_URL}/check`, { method: 'GET' });
+        if (response.ok) {
+          apiAwake.value = true;
+          clearInterval(pingInterval);
+          onLoadingComplete();
+        }
+      } catch (e) {
+        // API non réveillée, on continue
+      }
+    };
+
+    const startApiWakeup = () => {
+      apiAwake.value = false;
+      isLoading.value = true;
+      pingInterval = setInterval(pingApi, 1000);
+      pingApi(); // Premier essai immédiat
+    };
 
     const logout = () => {
       localStorage.removeItem('token');
@@ -58,6 +83,14 @@ export default {
 
     const onLoadingComplete = () => {
       isLoading.value = false;
+      apiAwake.value = true;
+      if (pingInterval) clearInterval(pingInterval);
+      // Redirection vers /login si pas connecté
+      if (!localStorage.getItem('token') && route.path !== '/login' && route.path !== '/signup') {
+        router.replace('/login');
+      } else if (localStorage.getItem('token') && (route.path === '/login' || route.path === '/signup')) {
+        router.replace('/');
+      }
     };
 
     watch(
@@ -68,7 +101,7 @@ export default {
     );
 
     onMounted(() => {
-      // Vue application mounted, starting loading sequence
+      startApiWakeup();
     });
 
     return {
@@ -76,6 +109,7 @@ export default {
       isLoading,
       logout,
       onLoadingComplete,
+      apiAwake,
     };
   },
 };
