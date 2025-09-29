@@ -17,34 +17,64 @@
           <div class="uk-margin">
             <label class="uk-form-label" for="new-title">Titre</label>
             <div class="uk-form-controls">
-              <input class="uk-input" id="new-title" type="text" v-model="newArticle.title" required>
+              <input
+                class="uk-input"
+                id="new-title"
+                type="text"
+                v-model="newArticle.title"
+                required
+              />
             </div>
           </div>
 
           <div class="uk-margin">
             <label class="uk-form-label" for="new-desc">Description</label>
             <div class="uk-form-controls">
-              <textarea class="uk-textarea" id="new-desc" v-model="newArticle.desc" rows="5" required></textarea>
+              <textarea
+                class="uk-textarea"
+                id="new-desc"
+                v-model="newArticle.desc"
+                rows="5"
+                required
+              ></textarea>
             </div>
           </div>
 
           <div class="uk-margin">
             <label class="uk-form-label" for="new-author">Auteur</label>
             <div class="uk-form-controls">
-              <input class="uk-input" id="new-author" type="text" v-model="newArticle.author" required>
+              <input
+                class="uk-input"
+                id="new-author"
+                type="text"
+                v-model="newArticle.author"
+                required
+              />
             </div>
           </div>
 
           <div class="uk-margin">
             <label class="uk-form-label" for="new-imgPath">URL de l'image (optionnel)</label>
             <div class="uk-form-controls">
-              <input class="uk-input" id="new-imgPath" type="text" v-model="newArticle.imgPath" placeholder="https://example.com/image.jpg">
+              <input
+                class="uk-input"
+                id="new-imgPath"
+                type="text"
+                v-model="newArticle.imgPath"
+                placeholder="https://example.com/image.jpg"
+              />
             </div>
           </div>
 
           <p class="uk-text-right">
-            <button class="uk-button uk-button-default uk-modal-close" type="button">Annuler</button>
-            <button class="uk-button uk-button-primary uk-margin-small-left" type="submit" :disabled="creating">
+            <button class="uk-button uk-button-default uk-modal-close" type="button">
+              Annuler
+            </button>
+            <button
+              class="uk-button uk-button-primary uk-margin-small-left"
+              type="submit"
+              :disabled="creating"
+            >
               <span v-if="creating" uk-spinner="ratio: 0.8"></span>
               <span v-else>Créer</span>
             </button>
@@ -76,13 +106,22 @@
             <td>{{ article.title }}</td>
             <td>{{ article.author }}</td>
             <td>
-              <router-link :to="{ name: 'ArticleDetail', params: { id: article.id } }" class="uk-button uk-button-small uk-button-primary uk-margin-small-right">
+              <router-link
+                :to="{ name: 'ArticleDetail', params: { id: article.id } }"
+                class="uk-button uk-button-small uk-button-primary uk-margin-small-right"
+              >
                 Détail
               </router-link>
-              <router-link :to="{ name: 'ArticleEdit', params: { id: article.id } }" class="uk-button uk-button-small uk-button-secondary uk-margin-small-right">
+              <router-link
+                :to="{ name: 'ArticleEdit', params: { id: article.id } }"
+                class="uk-button uk-button-small uk-button-secondary uk-margin-small-right"
+              >
                 Modifier
               </router-link>
-              <button @click="confirmDelete(article)" class="uk-button uk-button-small uk-button-danger">
+              <button
+                @click="confirmDelete(article)"
+                class="uk-button uk-button-small uk-button-danger"
+              >
                 Supprimer
               </button>
             </td>
@@ -106,7 +145,7 @@ const newArticle = ref({
   title: '',
   desc: '',
   author: '',
-  imgPath: ''
+  imgPath: '',
 });
 
 const fetchArticles = async () => {
@@ -115,7 +154,7 @@ const fetchArticles = async () => {
     const token = localStorage.getItem('token');
     const response = await fetch(`${apiUrl}/articles`, {
       headers: {
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
     });
 
@@ -135,14 +174,13 @@ const fetchArticles = async () => {
 };
 
 const openCreateModal = () => {
-  // Reset form
   newArticle.value = {
     title: '',
     desc: '',
     author: '',
-    imgPath: ''
+    imgPath: '',
   };
-  // Open modal
+
   UIkit.modal('#create-article-modal').show();
 };
 
@@ -155,7 +193,6 @@ const createArticle = async () => {
   const token = localStorage.getItem('token');
   logger.info('Creating new article.');
 
-  // Utiliser une image placeholder si aucune URL n'est fournie
   const articleData = {
     ...newArticle.value,
   };
@@ -168,9 +205,9 @@ const createArticle = async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(articleData)
+      body: JSON.stringify(articleData),
     });
 
     const data = await response.json();
@@ -180,9 +217,13 @@ const createArticle = async () => {
     }
 
     logger.info('Article created successfully.');
-    UIkit.notification({ message: 'Article créé avec succès !', status: 'success', pos: 'top-center' });
+    UIkit.notification({
+      message: 'Article créé avec succès !',
+      status: 'success',
+      pos: 'top-center',
+    });
     closeCreateModal();
-    // Refresh the list
+
     await fetchArticles();
   } catch (err) {
     logger.error('Error creating article:', err);
@@ -192,15 +233,22 @@ const createArticle = async () => {
   }
 };
 
-const confirmDelete = (article) => {
-  UIkit.modal.confirm(`Êtes-vous sûr de vouloir supprimer l'article "${article.title}" ? Cette action est irréversible.`).then(() => {
-    deleteArticle(article.id);
-  }, () => {
-    logger.info(`Article deletion cancelled for article ${article.id}.`);
-  });
+const confirmDelete = article => {
+  UIkit.modal
+    .confirm(
+      `Êtes-vous sûr de vouloir supprimer l'article "${article.title}" ? Cette action est irréversible.`
+    )
+    .then(
+      () => {
+        deleteArticle(article.id);
+      },
+      () => {
+        logger.info(`Article deletion cancelled for article ${article.id}.`);
+      }
+    );
 };
 
-const deleteArticle = async (articleId) => {
+const deleteArticle = async articleId => {
   loading.value = true;
   const token = localStorage.getItem('token');
   logger.info(`Deleting article ${articleId}.`);
@@ -209,8 +257,8 @@ const deleteArticle = async (articleId) => {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/articles/${articleId}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -219,8 +267,12 @@ const deleteArticle = async (articleId) => {
     }
 
     logger.info('Article deleted successfully.');
-    UIkit.notification({ message: 'Article supprimé avec succès !', status: 'success', pos: 'top-center' });
-    // Refresh the list
+    UIkit.notification({
+      message: 'Article supprimé avec succès !',
+      status: 'success',
+      pos: 'top-center',
+    });
+
     await fetchArticles();
   } catch (err) {
     logger.error('Error deleting article:', err);

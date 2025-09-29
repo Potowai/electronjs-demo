@@ -15,7 +15,7 @@
  * flag:
  *
  * ```
- *  // Create the browser window.
+ *
  *  mainWindow = new BrowserWindow({
  *    width: 800,
  *    height: 600,
@@ -28,17 +28,13 @@
 
 import './index.css';
 
-// Import UIkit CSS and JS
 import UIkit from 'uikit';
 import Icons from 'uikit/dist/js/uikit-icons';
 import 'uikit/dist/css/uikit.min.css';
 
-// Initialize UIkit Icons
 UIkit.use(Icons);
 
-console.log(
-  '👋 This message is being logged by "renderer.js", included via Vite',
-);
+console.log('👋 This message is being logged by "renderer.js", included via Vite');
 
 import { createApp } from 'vue';
 import App from './App.vue';

@@ -1,14 +1,13 @@
-// Logger utility pour l'application
 class Logger {
   constructor() {
-    this.logLevel = 'DEBUG'; // DEBUG, INFO, WARN, ERROR
+    this.logLevel = 'DEBUG';
     this.logs = [];
   }
 
   formatMessage(level, message, data = null) {
     const timestamp = new Date().toISOString();
     const formattedMessage = `[${timestamp}] [${level}] ${message}`;
-    
+
     if (data) {
       console.log(formattedMessage, data);
       this.logs.push({ timestamp, level, message, data });
@@ -55,54 +54,51 @@ class Logger {
     this.logs = [];
   }
 
-  // Méthode spéciale pour les requêtes HTTP
   logHttpRequest(method, url, options = {}) {
     this.info(`🌐 HTTP ${method} Request`, {
       url,
       options: {
         ...options,
-        // Masquer les données sensibles si nécessaire
-        headers: options.headers ? { ...options.headers } : undefined
-      }
+
+        headers: options.headers ? { ...options.headers } : undefined,
+      },
     });
   }
 
   logHttpResponse(method, url, response, duration) {
     const status = response.status;
     const statusText = response.statusText;
-    
+
     if (status >= 200 && status < 300) {
       this.info(`✅ HTTP ${method} Success (${duration}ms)`, {
         url,
         status,
-        statusText
+        statusText,
       });
     } else if (status >= 400) {
       this.error(`❌ HTTP ${method} Error (${duration}ms)`, {
         url,
         status,
-        statusText
+        statusText,
       });
     } else {
       this.warn(`⚠️ HTTP ${method} Warning (${duration}ms)`, {
         url,
         status,
-        statusText
+        statusText,
       });
     }
   }
 
-  // Méthode pour logger les erreurs API avec détails
   logApiError(endpoint, error, context = {}) {
     this.error(`🚨 API Error on ${endpoint}`, {
       error: error.message,
       stack: error.stack,
-      context
+      context,
     });
   }
 }
 
-// Instance singleton du logger
 const logger = new Logger();
 
 export default logger;

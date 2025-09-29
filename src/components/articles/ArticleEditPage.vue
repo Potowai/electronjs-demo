@@ -5,21 +5,27 @@
       <div class="uk-margin">
         <label class="uk-form-label" for="title">Titre</label>
         <div class="uk-form-controls">
-          <input class="uk-input" id="title" type="text" v-model="article.title" required>
+          <input class="uk-input" id="title" type="text" v-model="article.title" required />
         </div>
       </div>
 
       <div class="uk-margin">
         <label class="uk-form-label" for="desc">Description</label>
         <div class="uk-form-controls">
-          <textarea class="uk-textarea" id="desc" v-model="article.desc" rows="5" required></textarea>
+          <textarea
+            class="uk-textarea"
+            id="desc"
+            v-model="article.desc"
+            rows="5"
+            required
+          ></textarea>
         </div>
       </div>
 
       <div class="uk-margin">
         <label class="uk-form-label" for="imgPath">URL de l'image</label>
         <div class="uk-form-controls">
-          <input class="uk-input" id="imgPath" type="text" v-model="article.imgPath">
+          <input class="uk-input" id="imgPath" type="text" v-model="article.imgPath" />
         </div>
       </div>
 
@@ -28,10 +34,14 @@
           <span v-if="loading" uk-spinner="ratio: 0.8"></span>
           <span v-else>Mettre à jour</span>
         </button>
-        <router-link :to="{ name: 'ArticleDetail', params: { id: article.id } }" class="uk-button uk-button-default uk-margin-left">Annuler</router-link>
+        <router-link
+          :to="{ name: 'ArticleDetail', params: { id: article.id } }"
+          class="uk-button uk-button-default uk-margin-left"
+          >Annuler</router-link
+        >
       </div>
     </form>
-    <div v-else-if="loading" class="uk-flex uk-flex-center uk-flex-middle" style="height: 50vh;">
+    <div v-else-if="loading" class="uk-flex uk-flex-center uk-flex-middle" style="height: 50vh">
       <span uk-spinner="ratio: 3"></span>
     </div>
     <div v-else-if="error" class="uk-alert-danger" uk-alert>
@@ -61,7 +71,7 @@ const fetchArticle = async () => {
 
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/articles/${articleId}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
     });
     if (!response.ok) throw new Error('Failed to fetch article data.');
     const data = await response.json();
@@ -84,20 +94,19 @@ const updateArticle = async () => {
   logger.info(`Starting update process for article ${articleId}.`);
 
   try {
-    // 1. Créer le nouvel article
     logger.debug('Step 1: Saving the new article data.');
     const saveResponse = await fetch(`${apiUrl}/articles/save`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         title: article.value.title,
         desc: article.value.desc,
         imgPath: article.value.imgPath,
-        author: article.value.author, // Assurez-vous que l'auteur est inclus si nécessaire
-      })
+        author: article.value.author,
+      }),
     });
 
     const saveData = await saveResponse.json();
@@ -106,28 +115,29 @@ const updateArticle = async () => {
     }
     logger.info('Step 1 successful: New article saved.');
 
-    // 2. Supprimer l'ancien article
     logger.debug(`Step 2: Deleting the old article ${articleId}.`);
     const deleteResponse = await fetch(`${apiUrl}/articles/${articleId}`, {
-      method: 'DELETE', // Correction: Utilisation de la méthode DELETE
+      method: 'DELETE',
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!deleteResponse.ok) {
-      // Même si la suppression échoue, le nouvel article a été créé.
-      // On peut logger l'erreur mais continuer le processus.
       const deleteData = await deleteResponse.json();
-      logger.warn(`Failed to delete the old article, but the new one was saved. Reason: ${deleteData.message}`);
+      logger.warn(
+        `Failed to delete the old article, but the new one was saved. Reason: ${deleteData.message}`
+      );
     } else {
       logger.info('Step 2 successful: Old article deleted.');
     }
 
-    // 3. Redirection
-    UIkit.notification({ message: 'Article mis à jour avec succès !', status: 'success', pos: 'top-center' });
+    UIkit.notification({
+      message: 'Article mis à jour avec succès !',
+      status: 'success',
+      pos: 'top-center',
+    });
     router.push({ name: 'ArticlesList' });
-
   } catch (err) {
     logger.error('An error occurred during the update process:', err);
     error.value = err.message;

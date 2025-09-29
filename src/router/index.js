@@ -20,7 +20,7 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: ArticlesListPage, // La page d'accueil est maintenant la liste des articles
+    component: ArticlesListPage,
     meta: { requiresAuth: true },
   },
   {
@@ -58,11 +58,9 @@ router.beforeEach((to, from, next) => {
   const loggedIn = localStorage.getItem('token');
 
   if (to.matched.some(record => record.meta.requiresAuth) && !loggedIn) {
-    // Si la route nécessite une authentification et que l'utilisateur n'est pas connecté,
-    // rediriger vers la page de connexion.
     next('/login');
   } else {
-    next(); // Sinon, continuer la navigation.
+    next();
   }
 });
 

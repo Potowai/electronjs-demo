@@ -7,17 +7,27 @@
           <div class="uk-margin">
             <div class="uk-inline uk-width-1-1">
               <span class="uk-form-icon" uk-icon="icon: mail"></span>
-              <input class="uk-input" type="email" v-model="email" placeholder="Email" required>
+              <input class="uk-input" type="email" v-model="email" placeholder="Email" required />
             </div>
           </div>
           <div class="uk-margin">
             <div class="uk-inline uk-width-1-1">
               <span class="uk-form-icon" uk-icon="icon: lock"></span>
-              <input class="uk-input" type="password" v-model="password" placeholder="Mot de passe" required>
+              <input
+                class="uk-input"
+                type="password"
+                v-model="password"
+                placeholder="Mot de passe"
+                required
+              />
             </div>
           </div>
           <div class="uk-margin">
-            <button class="uk-button uk-button-primary uk-button-large uk-width-1-1" type="submit" :disabled="loading">
+            <button
+              class="uk-button uk-button-primary uk-button-large uk-width-1-1"
+              type="submit"
+              :disabled="loading"
+            >
               <span v-if="loading" uk-spinner="ratio: 0.8"></span>
               <span v-else>Se connecter</span>
             </button>
@@ -29,16 +39,15 @@
             <router-link to="/signup">Pas encore de compte ? S'inscrire</router-link>
           </div>
         </form>
-        
+
         <!-- Indice pour le développement -->
         <div v-if="isDev" class="uk-alert-primary uk-margin-top" uk-alert>
           <p class="uk-text-small">
-            <strong>Pour le test :</strong><br>
-            Email: <code>isaac@gmail.com</code><br>
+            <strong>Pour le test :</strong><br />
+            Email: <code>isaac@gmail.com</code><br />
             Mot de passe: <code>password</code>
           </p>
         </div>
-        
       </div>
     </div>
   </div>
@@ -84,11 +93,10 @@ export default {
           throw new Error(data.message || 'Erreur de connexion');
         }
 
-        // Stocker le token ou la session utilisateur ici
-        localStorage.setItem('token', data.token); 
+        localStorage.setItem('token', data.token);
         logger.info('Login successful, token stored.');
 
-        router.push('/'); // Rediriger vers la page d'accueil après connexion
+        router.push('/');
       } catch (err) {
         logger.error('Login failed:', err);
         error.value = err.message;

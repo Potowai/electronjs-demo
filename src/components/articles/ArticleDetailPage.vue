@@ -1,20 +1,33 @@
 <template>
   <div class="uk-container uk-container-large uk-margin-top">
     <div v-if="article">
-      <img :src="article.imgPath" :alt="article.title" class="uk-align-center uk-margin-bottom" style="width:100%; max-height:400px; object-fit: cover;">
+      <img
+        :src="article.imgPath"
+        :alt="article.title"
+        class="uk-align-center uk-margin-bottom"
+        style="width: 100%; max-height: 400px; object-fit: cover"
+      />
       <h1>{{ article.title }}</h1>
       <p class="uk-text-meta">By {{ article.author }}</p>
-      <hr>
+      <hr />
       <p>{{ article.desc }}</p>
-      <hr>
+      <hr />
       <router-link to="/articles" class="uk-button uk-button-default">Back to list</router-link>
-      <router-link :to="{ name: 'ArticleEdit', params: { id: article.id } }" class="uk-button uk-button-primary uk-margin-left">Modifier</router-link>
-      <button @click="confirmDelete" class="uk-button uk-button-danger uk-margin-left" :disabled="loading">
+      <router-link
+        :to="{ name: 'ArticleEdit', params: { id: article.id } }"
+        class="uk-button uk-button-primary uk-margin-left"
+        >Modifier</router-link
+      >
+      <button
+        @click="confirmDelete"
+        class="uk-button uk-button-danger uk-margin-left"
+        :disabled="loading"
+      >
         <span v-if="loading" uk-spinner="ratio: 0.8"></span>
         <span v-else>Supprimer</span>
       </button>
     </div>
-    <div v-else-if="loading" class="uk-flex uk-flex-center uk-flex-middle" style="height: 50vh;">
+    <div v-else-if="loading" class="uk-flex uk-flex-center uk-flex-middle" style="height: 50vh">
       <span uk-spinner="ratio: 3"></span>
     </div>
     <div v-else-if="error" class="uk-alert-danger" uk-alert>
@@ -44,8 +57,8 @@ const fetchArticle = async () => {
   try {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/articles/${articleId}`, {
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -62,11 +75,16 @@ const fetchArticle = async () => {
 };
 
 const confirmDelete = () => {
-  UIkit.modal.confirm('Êtes-vous sûr de vouloir supprimer cet article ? Cette action est irréversible.').then(() => {
-    deleteArticle();
-  }, () => {
-    logger.info('Article deletion cancelled by user.');
-  });
+  UIkit.modal
+    .confirm('Êtes-vous sûr de vouloir supprimer cet article ? Cette action est irréversible.')
+    .then(
+      () => {
+        deleteArticle();
+      },
+      () => {
+        logger.info('Article deletion cancelled by user.');
+      }
+    );
 };
 
 const deleteArticle = async () => {
@@ -78,8 +96,8 @@ const deleteArticle = async () => {
     const response = await fetch(`${import.meta.env.VITE_API_URL}/articles/${article.value.id}`, {
       method: 'DELETE',
       headers: {
-        'Authorization': `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -88,7 +106,11 @@ const deleteArticle = async () => {
     }
 
     logger.info('Article deleted successfully.');
-    UIkit.notification({ message: 'Article supprimé avec succès !', status: 'success', pos: 'top-center' });
+    UIkit.notification({
+      message: 'Article supprimé avec succès !',
+      status: 'success',
+      pos: 'top-center',
+    });
     router.push({ name: 'ArticlesList' });
   } catch (err) {
     logger.error('Error deleting article:', err);

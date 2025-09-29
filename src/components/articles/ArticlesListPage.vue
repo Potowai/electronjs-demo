@@ -13,7 +13,7 @@
         <div v-for="article in articles" :key="article.id">
           <div class="uk-card uk-card-default uk-card-hover uk-margin-bottom">
             <div class="uk-card-media-top">
-              <img :src="article.imgPath" :alt="article.title">
+              <img :src="article.imgPath" :alt="article.title" />
             </div>
             <div class="uk-card-body">
               <h3 class="uk-card-title">{{ article.title }}</h3>
@@ -21,7 +21,10 @@
               <p>{{ article.desc }}</p>
             </div>
             <div class="uk-card-footer">
-              <router-link :to="{ name: 'ArticleDetail', params: { id: article.id } }" class="uk-button uk-button-text">
+              <router-link
+                :to="{ name: 'ArticleDetail', params: { id: article.id } }"
+                class="uk-button uk-button-text"
+              >
                 Lire la suite
               </router-link>
             </div>
@@ -48,7 +51,7 @@ export default {
         const token = localStorage.getItem('token');
         const response = await fetch(`${apiUrl}/articles`, {
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
 
