@@ -1,12 +1,22 @@
-# .github/workflows/release.yml
 name: Release app
 
 on:
   push:
+    paths:
+      - 'package.json'
   workflow_dispatch:
 
 jobs:
   build:
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (
+        github.event_name == 'push' &&
+        (
+          contains(github.event.head_commit.message, '"version":') ||
+          contains(github.event.head_commit.message, 'version')
+        )
+      )
     strategy:
       matrix:
         os:
@@ -26,7 +36,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # utile si le publisher lit les tags
+          fetch-depth: 0
 
       - name: Use Node.js
         uses: actions/setup-node@v4
