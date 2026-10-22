@@ -130,3 +130,8 @@ dist
 
 # Ignore VSCode user project settings
 .vscode
+
+# Local environment — never commit real values
+.env
+.env.local
+.env.*.local
